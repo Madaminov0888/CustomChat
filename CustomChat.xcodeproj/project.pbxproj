@@ -15,9 +15,9 @@
 		D52A0C212D2D4D1C006D67BD /* StorageManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = D52A0C202D2D4D1C006D67BD /* StorageManager.swift */; };
 		D52CE00C2C1F38B2007DC5AC /* String+.swift in Sources */ = {isa = PBXBuildFile; fileRef = D52CE00B2C1F38B2007DC5AC /* String+.swift */; };
 		D542C5B52D3282CD0046CBA5 /* ProfileEditView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D542C5B42D3282CD0046CBA5 /* ProfileEditView.swift */; };
+		D542C5B72D32CBCA0046CBA5 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = D542C5B62D32CBCA0046CBA5 /* GoogleService-Info.plist */; };
 		D56D4B7D2BA1B41E007885E4 /* ChatsRowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D56D4B7C2BA1B41E007885E4 /* ChatsRowView.swift */; };
 		D56D4B7F2BA1D7A5007885E4 /* Preview+.swift in Sources */ = {isa = PBXBuildFile; fileRef = D56D4B7E2BA1D7A5007885E4 /* Preview+.swift */; };
-		D59A5FAE2B910234009633BF /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = D59A5FAD2B910234009633BF /* GoogleService-Info.plist */; };
 		D59A5FB12B9102A7009633BF /* FirebaseAnalytics in Frameworks */ = {isa = PBXBuildFile; productRef = D59A5FB02B9102A7009633BF /* FirebaseAnalytics */; };
 		D59A5FB32B9102A7009633BF /* FirebaseAnalyticsOnDeviceConversion in Frameworks */ = {isa = PBXBuildFile; productRef = D59A5FB22B9102A7009633BF /* FirebaseAnalyticsOnDeviceConversion */; };
 		D59A5FB52B9102A7009633BF /* FirebaseAnalyticsSwift in Frameworks */ = {isa = PBXBuildFile; productRef = D59A5FB42B9102A7009633BF /* FirebaseAnalyticsSwift */; };
@@ -73,9 +73,9 @@
 		D52A0C202D2D4D1C006D67BD /* StorageManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StorageManager.swift; sourceTree = "<group>"; };
 		D52CE00B2C1F38B2007DC5AC /* String+.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "String+.swift"; sourceTree = "<group>"; };
 		D542C5B42D3282CD0046CBA5 /* ProfileEditView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileEditView.swift; sourceTree = "<group>"; };
+		D542C5B62D32CBCA0046CBA5 /* GoogleService-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		D56D4B7C2BA1B41E007885E4 /* ChatsRowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatsRowView.swift; sourceTree = "<group>"; };
 		D56D4B7E2BA1D7A5007885E4 /* Preview+.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Preview+.swift"; sourceTree = "<group>"; };
-		D59A5FAD2B910234009633BF /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		D59A5FE72B910346009633BF /* AuthView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthView.swift; sourceTree = "<group>"; };
 		D59A5FE92B910350009633BF /* AuthViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthViewModel.swift; sourceTree = "<group>"; };
 		D59A5FEC2B9103B9009633BF /* BackgroundView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackgroundView.swift; sourceTree = "<group>"; };
@@ -232,7 +232,7 @@
 				D59A5FF62B911277009633BF /* Utilities */,
 				D59B2CC62B925B04000280CD /* Extensions */,
 				D5E5E09E2B90989800815D39 /* Assets.xcassets */,
-				D59A5FAD2B910234009633BF /* GoogleService-Info.plist */,
+				D542C5B62D32CBCA0046CBA5 /* GoogleService-Info.plist */,
 				D5E5E0A02B90989800815D39 /* Preview Content */,
 			);
 			path = CustomChat;
@@ -368,7 +368,7 @@
 			files = (
 				D5E5E0A22B90989800815D39 /* Preview Assets.xcassets in Resources */,
 				D5E5E09F2B90989800815D39 /* Assets.xcassets in Resources */,
-				D59A5FAE2B910234009633BF /* GoogleService-Info.plist in Resources */,
+				D542C5B72D32CBCA0046CBA5 /* GoogleService-Info.plist in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
