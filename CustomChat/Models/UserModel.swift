@@ -77,4 +77,17 @@ struct UserModel: Codable, Identifiable {
         self.isPremium = false
     }
     
+    init(user: UserModel, name: String?, userName: String?, photoUrl: String?, phoneNumber: String?) {
+        self.id = user.id
+        self.authId = user.authId
+        self.name = name
+        self.userName = userName
+        self.phoneNumber = phoneNumber
+        self.email = user.email
+        self.isAnonymous = false
+        self.photoUrl = photoUrl ?? user.photoUrl
+        self.dateCreated = nil
+        self.isPremium = false
+    }
+    
 }

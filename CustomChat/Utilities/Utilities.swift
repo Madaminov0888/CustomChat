@@ -51,6 +51,7 @@ struct ProfileImageView: View {
                 } imageView: { image in
                     image
                         .resizable()
+                        .scaledToFill()
 //                        .frame(width: 50, height: 50)
                         .clipShape(RoundedRectangle(cornerRadius: 15))
                 }

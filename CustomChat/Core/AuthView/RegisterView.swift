@@ -91,8 +91,8 @@ extension RegisterView {
             if let image = vm.profileImage {
                 Image(uiImage: image)
                     .resizable()
-                    .frame(width: 120, height: 120)
                     .scaledToFill()
+                    .frame(width: 120, height: 120)
                     .clipShape(Circle())
                     .shadow(radius: 10)
                     .padding()

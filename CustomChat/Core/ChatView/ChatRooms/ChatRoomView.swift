@@ -171,6 +171,7 @@ extension ChatRoomView {
             
             ProfileImageView(otherUser: vm.getOtherUser(chat: chat))
                 .frame(width: 50, height: 50)
+                .clipShape(RoundedRectangle(cornerRadius: 15))
                 .padding(.horizontal)
             
         }

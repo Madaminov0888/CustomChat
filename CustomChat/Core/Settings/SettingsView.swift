@@ -41,6 +41,9 @@ struct SettingsView: View {
                 }
             }
         }
+        .onAppear(perform: {
+            vm.getUser()
+        })
         .task {
             await vm.getImageURL(id: user?.id)
         }
@@ -61,6 +64,7 @@ extension SettingsView {
                 } imageView: { image in
                     image
                         .resizable()
+                        .scaledToFill()
                         .frame(width: 90, height: 90)
                         .clipShape(Circle())
                 }

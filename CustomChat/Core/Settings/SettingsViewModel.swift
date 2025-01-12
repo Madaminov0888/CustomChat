@@ -6,9 +6,20 @@
 //
 
 import Foundation
+import UIKit
 
 
 final class SettingsViewModel: ObservableObject {
+    @Published var changed: Bool = false
+    @Published var image: UIImage? = nil
+    @Published var imageURL: String? = nil
+    @Published var progress: Double = 0
+    @Published var uploading: Bool = false
+    
+    private let networkManager = NetworkManager()
+    private let storageManager = StorageManager()
+    
+    
     @Published var user: UserModel? = nil {
         didSet {
             getUser()
@@ -35,10 +46,44 @@ final class SettingsViewModel: ObservableObject {
             checkForChanges()
         }
     }
-    @Published var changed: Bool = false
     
     
-    private let networkManager = NetworkManager()
+    func sendUserChanges() async {
+        guard let user else { return }
+        do {
+            print(imageURL)
+            let user1 = UserModel(
+                user: user,
+                name: surname.isEmpty ? name : name + " " + surname,
+                userName: username.isEmpty ? nil : username,
+                photoUrl: imageURL,
+                phoneNumber: phoneNumber)
+            try await networkManager.putUserChanges(user: user1)
+        } catch {
+            print("sendUserChanges: ", error, error.localizedDescription)
+        }
+    }
+    
+    
+    
+    func uploadImage() async {
+        guard let image else { return }
+        do {
+            let url = try await storageManager.uploadUserPhoto(image: image) { [weak self] progress in
+                guard let progressValue = progress?.fractionCompleted else { return }
+                Task { @MainActor in
+                    self?.progress = progressValue
+                }
+            }
+            await MainActor.run {
+                self.imageURL = url.absoluteString
+            }
+        } catch {
+            print("uploadImage: ", error)
+        }
+    }
+    
+    
     
     func getImageURL(id: String?) async {
         guard let id else { return }
@@ -82,8 +127,9 @@ final class SettingsViewModel: ObservableObject {
         let isSurnameChanged = surname != (originalSplitName.surname ?? "")
         let isUsernameChanged = username != (user.userName ?? "")
         let isPhoneNumberChanged = phoneNumber != (user.phoneNumber ?? "")
+        let imageURLChanged = image != nil
         
         // Set `changed` to true if any value differs
-        changed = isNameChanged || isSurnameChanged || isUsernameChanged || isPhoneNumberChanged
+        changed = isNameChanged || isSurnameChanged || isUsernameChanged || isPhoneNumberChanged || imageURLChanged
     }
 }

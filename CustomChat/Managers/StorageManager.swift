@@ -33,7 +33,6 @@ final class StorageManager {
         }
         let _ = try await reference.putDataAsync(data, metadata: metadata, onProgress: progress)
         let downloadURL = try await reference.downloadURL()
-        print(downloadURL)
         return downloadURL
     }
     

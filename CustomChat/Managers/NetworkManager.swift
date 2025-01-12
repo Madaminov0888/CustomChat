@@ -60,6 +60,32 @@ class NetworkManager {
     }
     
     
+    func putUserChanges(user: UserModel) async throws {
+        // Ensure the URL is correctly formed
+        guard let url = URL(string: dbURL + userURL) else {
+            throw URLError(.badURL)
+        }
+        
+        // Encode the user object into JSON data
+        let data = try JSONEncoder().encode(user)
+        if let jsonString = String(data: data, encoding: .utf8) {
+            print("JSON Payload Sent to Server: \(jsonString)")
+        }
+        
+        // Prepare the PUT request
+        var request = URLRequest(url: url)
+        request.httpMethod = "PUT"
+        request.httpBody = data
+        request.addValue("application/json", forHTTPHeaderField: "Content-Type")
+        
+        // Send the PUT request
+        let (_, response) = try await URLSession.shared.data(for: request)
+        try handleResponse(response: response)
+    }
+    
+    
+    
+    
     func postChat(user: UserModel, creator: UserModel) async throws -> ChatModel {
         guard let url = URL(string: dbURL + "post_chat/\(creator.id)/\(user.id)") else {
             throw URLError(.badURL)

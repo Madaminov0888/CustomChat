@@ -20,7 +20,6 @@ class LocalFileManager {
     func getOrDownload(url: URL, key: String, media: MediaTypes) async throws -> URL {
         // Check if the media exists in local storage
         if let localPath = getMedia(key: key, media: media) {
-            print("Retrieved from local cache")
             return localPath
         }
         
@@ -36,7 +35,6 @@ class LocalFileManager {
             throw FileManagerError.fileSaveFailed
         }
         
-        print("Downloaded and saved to cache")
         return savedPath
     }
     
