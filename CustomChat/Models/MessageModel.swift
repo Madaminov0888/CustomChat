@@ -7,6 +7,7 @@
 
 import Foundation
 import UIKit
+import AVKit
 
 
 struct MessageModel: Identifiable, Codable, Equatable {
@@ -20,6 +21,7 @@ struct MessageModel: Identifiable, Codable, Equatable {
     let content: String
     let dateSent: String
     let photoURL: String?
+    let videoURL: String?
     var isItSeen: Bool
     
     enum CodingKeys: String, CodingKey {
@@ -29,6 +31,7 @@ struct MessageModel: Identifiable, Codable, Equatable {
         case content = "content"
         case dateSent = "date_sent"
         case photoURL = "image_URL"
+        case videoURL = "video_url"
         case isItSeen = "is_it_seen"
     }
     
@@ -50,7 +53,25 @@ struct MessageStateModel: Codable {
 }
 
 
-struct MessageImageTempModel: Identifiable {
+//struct MessageImageTempModel: Identifiable {
+//    let id: String
+//    let image: UIImage
+//}
+//
+
+
+struct MessageMediaTempModel: Identifiable {
     let id: String
-    let image: UIImage
+    let type: MediaType
+    let content: MediaContent
+}
+
+enum MediaType {
+    case image
+    case video
+}
+
+enum MediaContent {
+    case image(UIImage)
+    case video(URL) // Video content will be represented by a URL (e.g., local file URL)
 }

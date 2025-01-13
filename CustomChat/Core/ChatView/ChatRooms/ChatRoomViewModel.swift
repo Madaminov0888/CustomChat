@@ -17,9 +17,16 @@ final class ChatRoomViewModel: ObservableObject {
     
     @Published var messages: [MessageModel] = []
     @Published var messageText: String = ""
-    @Published var selectedImages: [PhotosPickerItem] = []
-    @Published var selectedUIImages: [UIImage] = []
-    @Published var sendingImages: [MessageImageTempModel] = []
+    
+//    @Published var selectedUIImages: [UIImage] = []
+    @Published var selectedMedia: [MessageMediaTempModel] = []
+    //Image sending
+    @Published var sendingImages: [MessageMediaTempModel] = []
+    //video sending
+    @Published var sendingVideos: [MessageMediaTempModel] = []
+    
+    
+    @Published var previewImages: (image: Image,id: String)? = nil
     
     @Published var lastMessage: MessageModel?
     
@@ -64,23 +71,23 @@ final class ChatRoomViewModel: ObservableObject {
     
     
     
-    func getUIImages() async {
-        do {
-            await MainActor.run {
-                self.selectedUIImages.removeAll()
-            }
-            for image in selectedImages {
-                if let data = try await image.loadTransferable(type: Data.self),
-                    let uiimage = UIImage(data: data) {
-                    await MainActor.run {
-                        self.selectedUIImages.append(uiimage)
-                    }
-                }
-            }
-        } catch {
-            print(error)
-        }
-    }
+//    func getUIImages() async {
+//        do {
+//            await MainActor.run {
+//                self.selectedUIImages.removeAll()
+//            }
+//            for image in selectedImages {
+//                if let data = try await image.loadTransferable(type: Data.self),
+//                    let uiimage = UIImage(data: data) {
+//                    await MainActor.run {
+//                        self.selectedUIImages.append(uiimage)
+//                    }
+//                }
+//            }
+//        } catch {
+//            print(error)
+//        }
+//    }
     
     
     
@@ -130,4 +137,61 @@ final class ChatRoomViewModel: ObservableObject {
         }
     }
     
+}
+
+
+
+
+//MARK: PhotosPicker handler
+extension ChatRoomViewModel {
+    func handlePickerItems(_ pickerItems: [PhotosPickerItem]) async {
+        await MainActor.run {
+            self.selectedMedia.removeAll()
+        }
+        
+        for item in pickerItems {
+            do {
+                if let transferableData = try await item.loadTransferable(type: Data.self) {
+                    if item.supportedContentTypes.contains(where: { type in type.isSubtype(of: .audiovisualContent)}) {
+                            // Save video locally and store the URL
+                        let tempURL = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString + ".mp4")
+                        try transferableData.write(to: tempURL)
+                        
+                        let mediaModel = MessageMediaTempModel(
+                            id: UUID().uuidString,
+                            type: .video,
+                            content: .video(tempURL)
+                        )
+                        await MainActor.run {
+                            selectedMedia.append(mediaModel)
+                        }
+                    } else {
+                        if let uiImage = UIImage(data: transferableData) {
+                            await MainActor.run {
+                                selectedMedia.append(
+                                    MessageMediaTempModel(id: UUID().uuidString, type: .image, content: .image(uiImage))
+                                )
+                            }
+                        }
+                    }
+                }
+            } catch {
+                print("Error handling picker item: \(error.localizedDescription)")
+            }
+        }
+    }
+    
+    
+    func getImagesCount() -> Int {
+        selectedMedia.filter { $0.type == .image }.count
+    }
+    
+    func getVideosCount() -> Int {
+        selectedMedia.filter { $0.type == .video }.count
+    }
+    
+    func getImageVideo() {
+        self.sendingImages = selectedMedia.filter { $0.type == .image }
+        self.sendingVideos = selectedMedia.filter { $0.type == .video }
+    }
 }

@@ -12,30 +12,38 @@ import UIKit
 struct MessageTempView: View {
     @EnvironmentObject private var parentVM: ChatRoomViewModel
     @StateObject private var vm = MessageTempViewModel()
-    let imageModel: MessageImageTempModel
+    let imageModel: MessageMediaTempModel
     let chat: ChatModel
     @State private var task: Task<Void, Never>? = nil
     
     
     var body: some View {
         VStack(alignment: .trailing) {
-            Image(uiImage: imageModel.image)
-                .resizable()
-                .frame(maxWidth: 200, maxHeight: 200)
-                .scaledToFit()
-                .overlay {
-                    Color.white.opacity(0.1)
-                        .frame(maxWidth: .infinity, maxHeight: .infinity)
-                        .glassBlurView()
-                        .overlay {
-                            CSProgressView()
-                        }
-                }
-                .clipShape(RoundedRectangle(cornerRadius: 20))
+            switch imageModel.content {
+            case .image(let uIImage):
+                Image(uiImage: uIImage)
+                    .resizable()
+                    .frame(maxWidth: 200, maxHeight: 200)
+                    .scaledToFit()
+                    .overlay {
+                        Color.white.opacity(0.1)
+                            .frame(maxWidth: .infinity, maxHeight: .infinity)
+                            .glassBlurView()
+                            .overlay {
+                                CSProgressView()
+                            }
+                    }
+                    .clipShape(RoundedRectangle(cornerRadius: 20))
+            case .video(let uRL): Text("").opacity(0)
+            }
         }
         .onAppear(perform: {
             task = Task {
-                await vm.uploadImage(image: imageModel.image, chat: chat, id: imageModel.id)
+                switch imageModel.content {
+                case .image(let uIImage):
+                    await vm.uploadImage(image: uIImage, chat: chat, id: imageModel.id)
+                case .video(let uRL): break
+                }
             }
         })
         .onDisappear(perform: {

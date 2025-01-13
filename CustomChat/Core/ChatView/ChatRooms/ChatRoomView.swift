@@ -12,6 +12,9 @@ struct ChatRoomView: View {
     
     @Environment(\.dismiss) var dismiss
     @StateObject private var vm = ChatRoomViewModel()
+    @Namespace var previewImageNamespace
+    @State private var pickerItems: [PhotosPickerItem] = []
+
     let chat: ChatModel
     
     @State private var showImagePicker: Bool = false
@@ -36,7 +39,7 @@ struct ChatRoomView: View {
                                 if showText {
                                     Text(Date.formatDateStringHeader(message.dateSent))
                                 }
-                                MessageRowView(message: message).id(message.id)
+                                MessageRowView(message: message, previewImageNamespace: previewImageNamespace).id(message.id)
                                     .onAppear(perform: {
                                         onAppearMessageStateFunc(message: message)
                                     })
@@ -70,13 +73,40 @@ struct ChatRoomView: View {
                     })
                 }
                 .overlay(alignment: .bottomLeading) {
-                    if vm.selectedUIImages.count > 0 {
+                    if vm.getImagesCount() > 0 {
                         ImagesPreview()
                     }
                 }
                 
                 MessageField()
                     .padding(.horizontal)
+            }
+            
+            Color.black
+                .ignoresSafeArea()
+                .overlay(alignment: .topTrailing) {
+                    Button {
+                        vm.previewImages = nil
+                    } label: {
+                        Image(systemName: "xmark")
+                            .font(.title)
+                            .fontWeight(.semibold)
+                            .foregroundStyle(Color.white)
+                            .contentShape(Circle())
+                    }
+                    .buttonStyle(.plain)
+                    .padding()
+                    .padding(.top)
+                }
+                .opacity(vm.previewImages != nil ? 1 : 0)
+                .animation(.easeOut(duration: 0.4), value: vm.previewImages?.image)
+            
+            if let image = vm.previewImages?.image, let id = vm.previewImages?.id {
+                image
+                    .resizable()
+                    .scaledToFit()
+                    .padding(.top)
+                    .matchedGeometryEffect(id: id, in: previewImageNamespace)
             }
         }
         .environmentObject(vm)
@@ -105,25 +135,31 @@ extension ChatRoomView {
                 .autocorrectionDisabled(true)
                 .textfieldModifier()
                 .overlay(alignment: .leading) {
-                    PhotosPicker(selection: $vm.selectedImages, maxSelectionCount: 3, selectionBehavior: .continuous, matching: .images, preferredItemEncoding: .automatic) {
+                    PhotosPicker(selection: $pickerItems, maxSelectionCount: 3, selectionBehavior: .continuous, matching: .any(of: [.images, .videos]), preferredItemEncoding: .automatic) {
                         Image(systemName: "paperclip")
                             .font(.headline)
                             .foregroundStyle(Color.gray)
                     }
                     .buttonStyle(.plain)
                     .padding(.leading)
+                    .onChange(of: pickerItems) { oldValue, newValue in
+                        Task {
+                            await vm.handlePickerItems(newValue)
+                        }
+                    }
                 }
             
             Button(action: {
-                if vm.selectedUIImages.count < 1 {
+                if vm.getImagesCount() < 1 && vm.getVideosCount() < 1 {
                     Task {
                         await vm.sendMessage(chat: chat)
                         vm.messageText = ""
                     }
                 } else {
-                    vm.sendingImages = vm.selectedUIImages.map({ MessageImageTempModel(id: UUID().uuidString, image: $0) })
-                    vm.selectedImages.removeAll()
-                    vm.selectedUIImages.removeAll()
+//                    vm.sendingImages = vm.selectedUIImages.map({ MessageImageTempModel(id: UUID().uuidString, image: $0) })
+//                    vm.selectedImages.removeAll()
+//                    vm.selectedUIImages.removeAll()
+                    vm.getImageVideo()
                 }
             }, label: {
                 Image(systemName: "arrow.up")
@@ -134,16 +170,6 @@ extension ChatRoomView {
                     .frame(width: 50, height: 50)
                     .clipShape(Circle())
             })
-        }
-        .onChange(of: vm.selectedImages) { oldValue, newValue in
-            if newValue.count > 0 {
-                Task {
-                    await vm.getUIImages()
-                }
-            } else if newValue.count == 0 {
-                vm.selectedImages.removeAll()
-                vm.selectedUIImages.removeAll()
-            }
         }
     }
     
@@ -205,14 +231,21 @@ extension ChatRoomView {
         ZStack {
             if showImagePicker {
                 HStack(spacing: 0) {
-                    ForEach(vm.selectedUIImages, id: \.self) { image in
-                        Image(uiImage: image)
-                            .resizable()
-                            .frame(width: 90, height: 90)
-                            .scaledToFill()
-                            .clipShape(RoundedRectangle(cornerRadius: 15))
-                            .padding(10)
-                            .animation(.smooth, value: showImagePicker)
+                    ForEach(vm.selectedMedia) { model in
+                        VStack {
+                            switch model.content {
+                            case .image(let image):
+                                Image(uiImage: image)
+                                    .resizable()
+                                    .frame(width: 90, height: 90)
+                                    .scaledToFill()
+                                    .clipShape(RoundedRectangle(cornerRadius: 15))
+                                    .padding(10)
+                                    .animation(.smooth, value: showImagePicker)
+                            case .video(let video):
+                                Text("").opacity(0)
+                            }
+                        }
                     }
                 }
             } else {
@@ -230,7 +263,7 @@ extension ChatRoomView {
         }
         .glassBlurView(Color.white)
         .overlay(alignment: .topTrailing, content: {
-            Text("\(vm.selectedUIImages.count)")
+            Text("\(vm.getImagesCount())")
                 .font(.headline)
                 .fontWeight(.semibold)
                 .foregroundStyle(Color.white)
