@@ -45,7 +45,29 @@ final class StorageManager {
         }
         let _ = try await reference.putDataAsync(data, metadata: metadata, onProgress: progress)
         let downloadURL = try await reference.downloadURL()
-        print(downloadURL)
+        return downloadURL
+    }
+    
+    public func uploadMessageVideo(videoURL: URL, chatId: String, messageId: String, progress: @escaping (Progress?) -> Void) async throws -> URL {
+        // Reference to Firebase Storage location
+        let reference = chatsReference.child("\(chatId)/\(messageId).mp4")
+        let metadata = StorageMetadata()
+        metadata.contentType = "video/mp4"
+
+        // Check if the video file exists at the given URL
+        guard FileManager.default.fileExists(atPath: videoURL.path) else {
+            throw StorageManagerError.couldntFindFile
+        }
+
+        // Read video file data
+        let videoData = try Data(contentsOf: videoURL)
+
+        // Upload the video data
+        let _ = try await reference.putDataAsync(videoData, metadata: metadata, onProgress: progress)
+
+        // Get the download URL
+        let downloadURL = try await reference.downloadURL()
+        print("Video uploaded. Download URL: \(downloadURL)")
         return downloadURL
     }
     
@@ -58,4 +80,5 @@ enum StorageManagerError: Error {
     case fileManagerCreationError(Error)
     case couldntConvertToJpeg
     case couldntConvertToUIImage
+    case couldntFindFile
 }

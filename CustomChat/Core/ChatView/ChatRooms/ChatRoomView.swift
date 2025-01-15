@@ -6,6 +6,7 @@
 //
 import SwiftUI
 import PhotosUI
+import AVKit
 
 
 struct ChatRoomView: View {
@@ -24,6 +25,11 @@ struct ChatRoomView: View {
             
             Color.csBackground
                 .ignoresSafeArea(edges: .bottom)
+                .onTapGesture {
+                    withAnimation(.bouncy) {
+                        self.showImagePicker.toggle()
+                    }
+                }
             
             VStack {
                 
@@ -34,47 +40,23 @@ struct ChatRoomView: View {
                 //Messages
                 ScrollView {
                     ScrollViewReader(content: { proxy in
-                        LazyVStack {
-                            ForEach(vm.getMessagesWithIntervals(), id: \.0.id) { message, showText in
-                                if showText {
-                                    Text(Date.formatDateStringHeader(message.dateSent))
-                                }
-                                MessageRowView(message: message, previewImageNamespace: previewImageNamespace).id(message.id)
-                                    .onAppear(perform: {
-                                        onAppearMessageStateFunc(message: message)
-                                    })
-                                    .overlay(alignment: .bottomTrailing) {
-                                        if message.sender.id == (try? AuthManager.shared.getAuthedUser().id) {
-                                            if message.isItSeen {
-                                                Text("Seen")
-                                                    .font(.footnote)
-                                                    .fontWeight(.semibold)
-                                                    .fontDesign(.rounded)
-                                                    .padding(.trailing, 10)
-                                                    .padding(.bottom, 5)
-                                                    .opacity(0.7)
-                                                    .foregroundStyle(Color.white)
-                                            }
-                                        }
-                                    }
+                        MessagesStack()
+                            .onChange(of: vm.messages.count, { oldValue, newValue in
+                                proxy.scrollTo(vm.messages.last?.id)
+                            })
+                            .onAppear {
+                                proxy.scrollTo(vm.messages.last?.id)
                             }
-                            
-                            Rectangle()
-                                .foregroundStyle(Color.clear)
-                                .frame(width: 100, height: 100)
-                            
-                            if vm.sendingImages.count > 0 {
-                                TempImageMessages()
-                            }
-                        }
-                        .onChange(of: vm.messages.count, { oldValue, newValue in
-                            proxy.scrollTo(vm.messages.last?.id)
-                        })
                     })
                 }
                 .overlay(alignment: .bottomLeading) {
-                    if vm.getImagesCount() > 0 {
-                        ImagesPreview()
+                    VStack(alignment: .leading) {
+                        if vm.getImagesCount() > 0 {
+                            ImagesPreview(type: .image)
+                        }
+                        if vm.getVideosCount() > 0 {
+                            ImagesPreview(type: .video)
+                        }
                     }
                 }
                 
@@ -84,20 +66,6 @@ struct ChatRoomView: View {
             
             Color.black
                 .ignoresSafeArea()
-                .overlay(alignment: .topTrailing) {
-                    Button {
-                        vm.previewImages = nil
-                    } label: {
-                        Image(systemName: "xmark")
-                            .font(.title)
-                            .fontWeight(.semibold)
-                            .foregroundStyle(Color.white)
-                            .contentShape(Circle())
-                    }
-                    .buttonStyle(.plain)
-                    .padding()
-                    .padding(.top)
-                }
                 .opacity(vm.previewImages != nil ? 1 : 0)
                 .animation(.easeOut(duration: 0.4), value: vm.previewImages?.image)
             
@@ -107,7 +75,13 @@ struct ChatRoomView: View {
                     .scaledToFit()
                     .padding(.top)
                     .matchedGeometryEffect(id: id, in: previewImageNamespace)
+                    .zIndex(0)
             }
+            
+            if let _ = vm.previewImages?.image {
+                ImagePreviewXmark()
+            }
+            
         }
         .environmentObject(vm)
         .navigationBarBackButtonHidden()
@@ -119,6 +93,10 @@ struct ChatRoomView: View {
 }
 
 
+
+
+
+
 extension ChatRoomView {
     private func onAppearMessageStateFunc(message: MessageModel) {
         if !message.isItSeen && message.sender.authId != (try? AuthManager.shared.getAuthedUser().id) {
@@ -127,6 +105,68 @@ extension ChatRoomView {
             }
         }
     }
+    
+    
+    
+    @ViewBuilder private func MessagesStack() -> some View {
+        LazyVStack {
+            ForEach(vm.getMessagesWithIntervals(), id: \.0.id) { message, showText in
+                if showText {
+                    Text(Date.formatDateStringHeader(message.dateSent))
+                }
+                MessageRowView(message: message, previewImageNamespace: previewImageNamespace).id(message.id)
+                    .onAppear(perform: {
+                        onAppearMessageStateFunc(message: message)
+                    })
+                    .overlay(alignment: .bottomTrailing) {
+                        if message.sender.id == (try? AuthManager.shared.getAuthedUser().id) {
+                            if message.isItSeen {
+                                Text("Seen")
+                                    .font(.footnote)
+                                    .fontWeight(.semibold)
+                                    .fontDesign(.rounded)
+                                    .padding(.trailing, 10)
+                                    .padding(.bottom, 5)
+                                    .opacity(0.7)
+                                    .foregroundStyle(Color.white)
+                            }
+                        }
+                    }
+            }
+            
+            Rectangle()
+                .foregroundStyle(Color.clear)
+                .frame(width: 100, height: 100)
+            
+            if vm.sendingImages.count > 0 {
+                TempImageMessages()
+            }
+        }
+    }
+    
+    
+    
+    @ViewBuilder private func ImagePreviewXmark() -> some View {
+        VStack(alignment: .trailing) {
+            HStack(alignment: .top) {
+                Spacer()
+                Button {
+                    vm.previewImages = nil
+                } label: {
+                    Image(systemName: "xmark")
+                        .font(.title)
+                        .fontWeight(.semibold)
+                        .foregroundStyle(Color.white)
+                        .contentShape(Circle())
+                }
+                .buttonStyle(.plain)
+                .padding()
+                .padding(.top)
+            }
+            Spacer()
+        }
+    }
+    
     
     
     @ViewBuilder private func MessageField() -> some View {
@@ -153,13 +193,13 @@ extension ChatRoomView {
                 if vm.getImagesCount() < 1 && vm.getVideosCount() < 1 {
                     Task {
                         await vm.sendMessage(chat: chat)
-                        vm.messageText = ""
+                        await MainActor.run{ vm.messageText = "" }
                     }
                 } else {
-//                    vm.sendingImages = vm.selectedUIImages.map({ MessageImageTempModel(id: UUID().uuidString, image: $0) })
-//                    vm.selectedImages.removeAll()
-//                    vm.selectedUIImages.removeAll()
                     vm.getImageVideo()
+                    vm.selectedMedia.removeAll()
+                    pickerItems.removeAll()
+                    vm.messageText = ""
                 }
             }, label: {
                 Image(systemName: "arrow.up")
@@ -220,50 +260,56 @@ extension ChatRoomView {
     @ViewBuilder private func TempImageMessages() -> some View {
         VStack(alignment: .trailing, spacing: 0) {
             ForEach(vm.sendingImages) { imageModel in
-                MessageTempView(imageModel: imageModel, chat: chat)
+                MessageTempView(mediaModel: imageModel, chat: chat)
+            }
+            ForEach(vm.sendingVideos) { videoModel in
+                MessageTempView(mediaModel: videoModel, chat: chat)
             }
         }
         .frame(maxWidth: .infinity)
     }
     
     
-    @ViewBuilder private func ImagesPreview() -> some View {
+    @ViewBuilder private func ImagesPreview(type: MediaType) -> some View {
         ZStack {
             if showImagePicker {
                 HStack(spacing: 0) {
-                    ForEach(vm.selectedMedia) { model in
+                    ForEach(vm.selectedMedia.filter({ $0.type == type })) { model in
                         VStack {
                             switch model.content {
                             case .image(let image):
                                 Image(uiImage: image)
                                     .resizable()
-                                    .frame(width: 90, height: 90)
                                     .scaledToFill()
+                                    .frame(width: 90, height: 90)
                                     .clipShape(RoundedRectangle(cornerRadius: 15))
                                     .padding(10)
                                     .animation(.smooth, value: showImagePicker)
                             case .video(let video):
-                                Text("").opacity(0)
+                                VideoPlayer(player: AVPlayer(url: video))
+                                    .frame(width: 120, height: 120)
+                                    .clipShape(RoundedRectangle(cornerRadius: 15))
+                                    .padding(10)
                             }
                         }
                     }
                 }
             } else {
-                Image(systemName: "photo")
+                Image(systemName: type == .image ? "photo" : "video.fill")
                     .font(.title)
                     .foregroundStyle(Color.gray.opacity(0.7))
                     .fontWeight(.bold)
                     .padding(10)
             }
         }
+        .glassBlurView(Color.white)
         .onTapGesture {
             withAnimation(.bouncy) {
                 self.showImagePicker.toggle()
             }
         }
-        .glassBlurView(Color.white)
         .overlay(alignment: .topTrailing, content: {
-            Text("\(vm.getImagesCount())")
+            Text(type == .image ? vm.getImagesCount().description : vm.getVideosCount().description)
                 .font(.headline)
                 .fontWeight(.semibold)
                 .foregroundStyle(Color.white)

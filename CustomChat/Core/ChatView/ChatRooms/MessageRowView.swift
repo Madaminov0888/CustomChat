@@ -48,6 +48,7 @@ struct MessageRowView: View {
                     VStack {
                         VideoPlayer(player: .init(url: url))
                             .frame(maxWidth: .infinity)
+                            .scaledToFit()
                     }
                     .frame(minWidth: 100, maxWidth: 300)
                 }

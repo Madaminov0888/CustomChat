@@ -135,6 +135,33 @@ final class MessagesManager {
     }
     
     
+    func sendMessageVideo(message: String, chatId: String, video: String, messageId: String) async throws {
+        guard let url = URL(string: websocketUrl + chatId) else {
+            throw URLError(.badURL)
+        }
+        
+        let ws = URLSession.shared.webSocketTask(with: url)
+        
+        ws.resume()
+        
+        
+        let request: [String: Any] = [
+            "type": "message_with_video",
+            "sender": try AuthManager.shared.getAuthedUser().authId ?? "",
+            "message": message,
+            "message_id":messageId,
+            "video_url": video,
+        ]
+        
+        
+        if let jsonData = JSONDecoder().convertDictionaryToJSON(request) {
+            try await ws.send(URLSessionWebSocketTask.Message.string(jsonData))
+        } else {
+            throw URLError(.cannotDecodeRawData)
+        }
+    }
+    
+    
     func sendMessageState(chatId: String, messageId: String) async throws {
         guard let url = URL(string: websocketUrl + chatId) else {
             throw URLError(.badURL)

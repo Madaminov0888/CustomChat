@@ -85,6 +85,12 @@ struct ChatView: View {
             }
         })
         .fontDesign(.rounded)
+        .refreshable {
+            Task {
+                try? await vm.loadUserChats()
+                await vm.connectionHandler()
+            }
+        }
     }
 }
 

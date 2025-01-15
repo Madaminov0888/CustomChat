@@ -7,19 +7,20 @@
 
 import SwiftUI
 import UIKit
+import AVKit
 
 
 struct MessageTempView: View {
     @EnvironmentObject private var parentVM: ChatRoomViewModel
     @StateObject private var vm = MessageTempViewModel()
-    let imageModel: MessageMediaTempModel
+    let mediaModel: MessageMediaTempModel
     let chat: ChatModel
     @State private var task: Task<Void, Never>? = nil
     
     
     var body: some View {
         VStack(alignment: .trailing) {
-            switch imageModel.content {
+            switch mediaModel.content {
             case .image(let uIImage):
                 Image(uiImage: uIImage)
                     .resizable()
@@ -30,19 +31,32 @@ struct MessageTempView: View {
                             .frame(maxWidth: .infinity, maxHeight: .infinity)
                             .glassBlurView()
                             .overlay {
-                                CSProgressView()
+                                CSProgressView(.image)
                             }
                     }
                     .clipShape(RoundedRectangle(cornerRadius: 20))
-            case .video(let uRL): Text("").opacity(0)
+            case .video(let url):
+                VideoPlayer(player: AVPlayer(url: url))
+                    .frame(maxWidth: 200, maxHeight: 200)
+                    .scaledToFit()
+                    .overlay {
+                        Color.white.opacity(0.1)
+                            .frame(maxWidth: .infinity, maxHeight: .infinity)
+                            .glassBlurView()
+                            .overlay {
+                                CSProgressView(.video)
+                            }
+                    }
+                    .clipShape(RoundedRectangle(cornerRadius: 20))
             }
         }
         .onAppear(perform: {
             task = Task {
-                switch imageModel.content {
+                switch mediaModel.content {
                 case .image(let uIImage):
-                    await vm.uploadImage(image: uIImage, chat: chat, id: imageModel.id)
-                case .video(let uRL): break
+                    await vm.uploadImage(image: uIImage, chat: chat, id: mediaModel.id)
+                case .video(let url):
+                    await vm.uploadVideo(videoURL: url, chat: chat, id: mediaModel.id)
                 }
             }
         })
@@ -54,10 +68,21 @@ struct MessageTempView: View {
         .onChange(of: vm.photoURL, { oldValue, newValue in
             Task {
                 if let image = vm.photoURL {
-                    await parentVM.sendMessageImage(chat: chat, messageID: imageModel.id, imageURL: image)
+                    await parentVM.sendMessageImage(chat: chat, messageID: mediaModel.id, imageURL: image)
                     await MainActor.run {
-                        let index = parentVM.sendingImages.firstIndex(where: { $0.id == imageModel.id })
+                        let index = parentVM.sendingImages.firstIndex(where: { $0.id == mediaModel.id })
                         parentVM.sendingImages.remove(atOffsets: IndexSet(integer: index ?? 0))
+                    }
+                }
+            }
+        })
+        .onChange(of: vm.videoURL, { oldValue, newValue in
+            Task {
+                if let videoURL = vm.videoURL {
+                    await parentVM.sendMessageVideo(chat: chat, messageID: mediaModel.id, videoURL: videoURL)
+                    await MainActor.run {
+                        let index = parentVM.sendingVideos.firstIndex(where: { $0.id == mediaModel.id })
+                        parentVM.sendingVideos.remove(atOffsets: IndexSet(integer: index ?? 0))
                     }
                 }
             }
@@ -70,7 +95,7 @@ struct MessageTempView: View {
 
 
 extension MessageTempView {
-    @ViewBuilder private func CSProgressView() -> some View {
+    @ViewBuilder private func CSProgressView(_ type: MediaType) -> some View {
         ZStack {
             // Black background
             Color.black.opacity(0.1)
@@ -96,7 +121,7 @@ extension MessageTempView {
                     .animation(.easeInOut, value: vm.progress)
                 
 
-                Image(systemName: "arrow.up")
+                Image(systemName: type == .image ? "arrow.up" : "arrow.up.right.video.fill")
                     .font(.system(size: 30, weight: .semibold))
                     .foregroundColor(.white)
             }
@@ -113,6 +138,8 @@ final class MessageTempViewModel: ObservableObject {
     @Published var progress: Double = 0
     @Published var photoURL: String? = nil
     
+    @Published var videoURL: String? = nil
+    
     private let storageManager = StorageManager()
     
     func uploadImage(image: UIImage, chat: ChatModel, id: String) async {
@@ -128,6 +155,22 @@ final class MessageTempViewModel: ObservableObject {
             
         } catch {
             print("Error while uploading message image",error)
+        }
+    }
+    
+    
+    func uploadVideo(videoURL: URL, chat: ChatModel, id: String) async {
+        do {
+            let url = try await storageManager.uploadMessageVideo(videoURL: videoURL, chatId: chat.id, messageId: id) { [weak self] progress in
+                DispatchQueue.main.async {
+                    self?.progress = progress?.fractionCompleted ?? 0
+                }
+            }
+            await MainActor.run {
+                self.videoURL = url.absoluteString
+            }
+        } catch {
+            print("error uploading video",error)
         }
     }
 }

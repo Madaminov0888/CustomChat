@@ -11,6 +11,7 @@ struct ChatsRowView: View {
     
     @EnvironmentObject var vm: ChatViewModel
     let chat: ChatModel
+    let currentUser: UserModel? = try? AuthManager.shared.getAuthedUser()
     
     var body: some View {
         VStack(spacing: 0) {
@@ -29,10 +30,32 @@ struct ChatsRowView: View {
                                 .font(.title3)
                                 .fontWeight(.semibold)
                             
-                            Text(vm.getLastMessage(chat: chat)?.content ?? "")
-                                .font(.subheadline)
-                                .foregroundStyle(Color.gray)
-                                .fontWeight(.semibold)
+                            HStack(spacing: 5) {
+                                if vm.getLastMessage(chat: chat)?.sender.id == currentUser?.id {
+                                    Text("You:")
+                                        .font(.subheadline)
+                                        .foregroundStyle(Color.gray)
+                                        .fontWeight(.semibold)
+                                }
+                                
+                                if let message = vm.getLastMessage(chat: chat), let _ = message.photoURL {
+                                    Image(systemName: "photo.fill")
+                                        .font(.subheadline)
+                                        .foregroundStyle(Color.gray)
+                                        .fontWeight(.semibold)
+                                }
+                                if let message = vm.getLastMessage(chat: chat), let _ = message.videoURL {
+                                    Image(systemName: "play.rectangle.fill")
+                                        .font(.subheadline)
+                                        .foregroundStyle(Color.gray)
+                                        .fontWeight(.semibold)
+                                }
+                                
+                                Text(vm.getLastMessage(chat: chat)?.content ?? "")
+                                    .font(.subheadline)
+                                    .foregroundStyle(Color.gray)
+                                    .fontWeight(.semibold)
+                            }
                         }
                         
                         Spacer()
@@ -77,7 +100,7 @@ struct ChatsRowView: View {
             .fontDesign(.rounded)
             .frame(maxWidth: .infinity)
             .frame(height: 75)
-            .clipShape(RoundedRectangle(cornerRadius: 20))
+//            .clipShape(RoundedRectangle(cornerRadius: 20))
             .contentShape(Rectangle())
         }
     }

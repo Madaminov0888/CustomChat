@@ -60,6 +60,15 @@ final class ChatRoomViewModel: ObservableObject {
         }
     }
     
+    func sendMessageVideo(chat: ChatModel, messageID: String, videoURL: String) async {
+        do {
+            try await messageManager.sendMessageVideo(message: messageText, chatId: chat.id, video: videoURL, messageId: messageID)
+        } catch {
+            print("error while sending video")
+            print(error)
+        }
+    }
+    
     
     func sendMessageState(message: MessageModel, chat: ChatModel) async {
         do {
@@ -144,34 +153,89 @@ final class ChatRoomViewModel: ObservableObject {
 
 //MARK: PhotosPicker handler
 extension ChatRoomViewModel {
+//    func handlePickerItems(_ pickerItems: [PhotosPickerItem]) async {
+//        await MainActor.run {
+//            self.selectedMedia.removeAll()
+//        }
+//        
+//        for item in pickerItems {
+//            do {
+//                if let transferableData = try await item.loadTransferable(type: Data.self) {
+//                    if item.supportedContentTypes.contains(where: { type in type.isSubtype(of: .audiovisualContent)}) {
+//                            // Save video locally and store the URL
+//                        let tempURL = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString + ".mp4")
+//                        try transferableData.write(to: tempURL)
+//                        
+//                        let mediaModel = MessageMediaTempModel(
+//                            id: UUID().uuidString,
+//                            type: .video,
+//                            content: .video(tempURL)
+//                        )
+//                        await MainActor.run {
+//                            selectedMedia.append(mediaModel)
+//                        }
+//                    } else {
+//                        if let uiImage = UIImage(data: transferableData) {
+//                            await MainActor.run {
+//                                selectedMedia.append(
+//                                    MessageMediaTempModel(id: UUID().uuidString, type: .image, content: .image(uiImage))
+//                                )
+//                            }
+//                        }
+//                    }
+//                }
+//            } catch {
+//                print("Error handling picker item: \(error.localizedDescription)")
+//            }
+//        }
+//    }
+    
+
     func handlePickerItems(_ pickerItems: [PhotosPickerItem]) async {
+        // Remove all previously selected media
         await MainActor.run {
             self.selectedMedia.removeAll()
         }
         
+        // Track processed items to avoid duplicates
+        var processedURLs: Set<URL> = []
+        var processedIDs: Set<String> = []
+        
         for item in pickerItems {
             do {
                 if let transferableData = try await item.loadTransferable(type: Data.self) {
-                    if item.supportedContentTypes.contains(where: { type in type.isSubtype(of: .audiovisualContent)}) {
-                            // Save video locally and store the URL
-                        let tempURL = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString + ".mp4")
+                    let id = UUID().uuidString
+                    
+                    if item.supportedContentTypes.contains(where: { $0.isSubtype(of: .audiovisualContent) }) {
+                        // Save video locally and store the URL
+                        let tempURL = FileManager.default.temporaryDirectory.appendingPathComponent(id + ".mp4")
+                        
                         try transferableData.write(to: tempURL)
                         
-                        let mediaModel = MessageMediaTempModel(
-                            id: UUID().uuidString,
-                            type: .video,
-                            content: .video(tempURL)
-                        )
-                        await MainActor.run {
-                            selectedMedia.append(mediaModel)
+                        // Avoid duplicates by checking the URL
+                        if !processedURLs.contains(tempURL) {
+                            let mediaModel = MessageMediaTempModel(
+                                id: id,
+                                type: .video,
+                                content: .video(tempURL)
+                            )
+                            await MainActor.run {
+                                selectedMedia.append(mediaModel)
+                            }
+                            processedURLs.insert(tempURL)
                         }
                     } else {
-                        if let uiImage = UIImage(data: transferableData) {
+                        // Handle images
+                        if let uiImage = UIImage(data: transferableData), !processedIDs.contains(id) {
+                            let mediaModel = MessageMediaTempModel(
+                                id: id,
+                                type: .image,
+                                content: .image(uiImage)
+                            )
                             await MainActor.run {
-                                selectedMedia.append(
-                                    MessageMediaTempModel(id: UUID().uuidString, type: .image, content: .image(uiImage))
-                                )
+                                selectedMedia.append(mediaModel)
                             }
+                            processedIDs.insert(id)
                         }
                     }
                 }
