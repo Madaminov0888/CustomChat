@@ -52,6 +52,14 @@ struct MessageRowView: View {
                     }
                     .frame(minWidth: 100, maxWidth: 300)
                 }
+                if let audioURL = message.audioURL, let url = URL(string: audioURL) {
+                    VStack {
+                        AudioPlayerView(audioURL: url)
+                            .glassBlurView(currentUserID != message.sender.id ? Color.gray : Color.green)
+                            .frame(width: 300)
+                            .scaledToFit()
+                    }
+                }
 
                 if message.content.count > 0 {
                     if message.photoURL != nil {

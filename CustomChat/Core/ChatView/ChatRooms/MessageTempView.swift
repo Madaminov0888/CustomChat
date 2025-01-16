@@ -48,6 +48,21 @@ struct MessageTempView: View {
                             }
                     }
                     .clipShape(RoundedRectangle(cornerRadius: 20))
+            case .audio(let url):
+                RoundedRectangle(cornerRadius: 20)
+                    .fill(Color.gray)
+                    .frame(maxWidth: 300, maxHeight: 100)
+                    .glassBlurView(Color.black)
+                    .scaledToFit()
+                    .overlay(alignment: .leading) {
+                        Color.white.opacity(0.1)
+                            .frame(maxWidth: .infinity, maxHeight: .infinity)
+                            .glassBlurView()
+                            .overlay {
+                                CSProgressView(.audio)
+                            }
+                            .padding(.leading)
+                    }
             }
         }
         .onAppear(perform: {
@@ -57,6 +72,8 @@ struct MessageTempView: View {
                     await vm.uploadImage(image: uIImage, chat: chat, id: mediaModel.id)
                 case .video(let url):
                     await vm.uploadVideo(videoURL: url, chat: chat, id: mediaModel.id)
+                case .audio(let url):
+                    await vm.uploadAudio(audioURL: url, chat: chat, id: mediaModel.id)
                 }
             }
         })
@@ -83,6 +100,17 @@ struct MessageTempView: View {
                     await MainActor.run {
                         let index = parentVM.sendingVideos.firstIndex(where: { $0.id == mediaModel.id })
                         parentVM.sendingVideos.remove(atOffsets: IndexSet(integer: index ?? 0))
+                    }
+                }
+            }
+        })
+        .onChange(of: vm.audioURL, { oldValue, newValue in
+            Task {
+                if let audio = vm.audioURL {
+                    await parentVM.sendMessageAudio(chat: chat, messageID: mediaModel.id, audioURL: audio)
+                    await MainActor.run {
+                        let index = parentVM.sendingAudios.firstIndex(where: { $0.id == mediaModel.id })
+                        parentVM.sendingAudios.remove(atOffsets: IndexSet(integer: index ?? 0))
                     }
                 }
             }
@@ -121,11 +149,10 @@ extension MessageTempView {
                     .animation(.easeInOut, value: vm.progress)
                 
 
-                Image(systemName: type == .image ? "arrow.up" : "arrow.up.right.video.fill")
+                Image(systemName: type == .image ? "arrow.up" : type == .audio ? "arrow.up.right.video.fill" : "waveform.badge.microphone")
                     .font(.system(size: 30, weight: .semibold))
                     .foregroundColor(.white)
             }
-            .frame(width: 100, height: 100) // Adjust the size as needed
         }
     }
 }
@@ -139,6 +166,7 @@ final class MessageTempViewModel: ObservableObject {
     @Published var photoURL: String? = nil
     
     @Published var videoURL: String? = nil
+    @Published var audioURL: String? = nil
     
     private let storageManager = StorageManager()
     
@@ -171,6 +199,21 @@ final class MessageTempViewModel: ObservableObject {
             }
         } catch {
             print("error uploading video",error)
+        }
+    }
+    
+    func uploadAudio(audioURL: URL, chat: ChatModel, id: String) async {
+        do {
+            let url = try await storageManager.uploadMessageAudio(audioURL: audioURL, chatId: chat.id, messageId: id) { [weak self] progress in
+                DispatchQueue.main.async {
+                    self?.progress = progress?.fractionCompleted ?? 0
+                }
+            }
+            await MainActor.run {
+                self.audioURL = url.absoluteString
+            }
+        } catch {
+            print("error uploadAudio.MessageTempViewModel:",error)
         }
     }
 }

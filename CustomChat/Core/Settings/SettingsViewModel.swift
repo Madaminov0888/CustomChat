@@ -51,7 +51,6 @@ final class SettingsViewModel: ObservableObject {
     func sendUserChanges() async {
         guard let user else { return }
         do {
-            print(imageURL)
             let user1 = UserModel(
                 user: user,
                 name: surname.isEmpty ? name : name + " " + surname,

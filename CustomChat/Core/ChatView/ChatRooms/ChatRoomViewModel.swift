@@ -24,6 +24,8 @@ final class ChatRoomViewModel: ObservableObject {
     @Published var sendingImages: [MessageMediaTempModel] = []
     //video sending
     @Published var sendingVideos: [MessageMediaTempModel] = []
+    //audio sending
+    @Published var sendingAudios: [MessageMediaTempModel] = []
     
     
     @Published var previewImages: (image: Image,id: String)? = nil
@@ -65,6 +67,15 @@ final class ChatRoomViewModel: ObservableObject {
             try await messageManager.sendMessageVideo(message: messageText, chatId: chat.id, video: videoURL, messageId: messageID)
         } catch {
             print("error while sending video")
+            print(error)
+        }
+    }
+    
+    func sendMessageAudio(chat: ChatModel, messageID: String, audioURL: String) async {
+        do {
+            try await messageManager.sendMessageAudio(message: messageText, chatId: chat.id, audioURL: audioURL, messageId: messageID)
+        } catch {
+            print("error while sending audio")
             print(error)
         }
     }
@@ -153,44 +164,6 @@ final class ChatRoomViewModel: ObservableObject {
 
 //MARK: PhotosPicker handler
 extension ChatRoomViewModel {
-//    func handlePickerItems(_ pickerItems: [PhotosPickerItem]) async {
-//        await MainActor.run {
-//            self.selectedMedia.removeAll()
-//        }
-//        
-//        for item in pickerItems {
-//            do {
-//                if let transferableData = try await item.loadTransferable(type: Data.self) {
-//                    if item.supportedContentTypes.contains(where: { type in type.isSubtype(of: .audiovisualContent)}) {
-//                            // Save video locally and store the URL
-//                        let tempURL = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString + ".mp4")
-//                        try transferableData.write(to: tempURL)
-//                        
-//                        let mediaModel = MessageMediaTempModel(
-//                            id: UUID().uuidString,
-//                            type: .video,
-//                            content: .video(tempURL)
-//                        )
-//                        await MainActor.run {
-//                            selectedMedia.append(mediaModel)
-//                        }
-//                    } else {
-//                        if let uiImage = UIImage(data: transferableData) {
-//                            await MainActor.run {
-//                                selectedMedia.append(
-//                                    MessageMediaTempModel(id: UUID().uuidString, type: .image, content: .image(uiImage))
-//                                )
-//                            }
-//                        }
-//                    }
-//                }
-//            } catch {
-//                print("Error handling picker item: \(error.localizedDescription)")
-//            }
-//        }
-//    }
-    
-
     func handlePickerItems(_ pickerItems: [PhotosPickerItem]) async {
         // Remove all previously selected media
         await MainActor.run {
@@ -254,7 +227,12 @@ extension ChatRoomViewModel {
         selectedMedia.filter { $0.type == .video }.count
     }
     
+    func getAudiosCount() -> Int {
+        selectedMedia.filter { $0.type == .audio }.count
+    }
+    
     func getImageVideo() {
+        self.sendingAudios = selectedMedia.filter { $0.type == .audio }
         self.sendingImages = selectedMedia.filter { $0.type == .image }
         self.sendingVideos = selectedMedia.filter { $0.type == .video }
     }

@@ -15,6 +15,7 @@ struct ChatRoomView: View {
     @StateObject private var vm = ChatRoomViewModel()
     @Namespace var previewImageNamespace
     @State private var pickerItems: [PhotosPickerItem] = []
+    @State private var isRecording: Bool = false
 
     let chat: ChatModel
     
@@ -57,11 +58,26 @@ struct ChatRoomView: View {
                         if vm.getVideosCount() > 0 {
                             ImagesPreview(type: .video)
                         }
+                        if vm.getAudiosCount() > 0 {
+                            ImagesPreview(type: .audio)
+                        }
                     }
                 }
                 
                 MessageField()
                     .padding(.horizontal)
+            }
+            .overlay(alignment: .bottomTrailing) {
+                AudioRecorderView(isRecording: $isRecording) { url in
+                    if let index = vm.selectedMedia.firstIndex(where: { $0.type == .audio }) {
+                        vm.selectedMedia.remove(at: index)
+                    } else {
+                        vm.selectedMedia.append(MessageMediaTempModel(id: UUID().uuidString, type: .audio, content: .audio(url)))
+                    }
+                }
+                .padding()
+                .padding(.bottom, 40)
+                .padding(.trailing)
             }
             
             Color.black
@@ -138,7 +154,7 @@ extension ChatRoomView {
                 .foregroundStyle(Color.clear)
                 .frame(width: 100, height: 100)
             
-            if vm.sendingImages.count > 0 {
+            if vm.sendingImages.count + vm.sendingVideos.count + vm.sendingAudios.count > 0 {
                 TempImageMessages()
             }
         }
@@ -188,9 +204,30 @@ extension ChatRoomView {
                         }
                     }
                 }
+                .overlay(alignment: .trailing) {
+                    if !isRecording {
+                        Image(systemName: "microphone.fill")
+                            .font(.title3)
+                            .foregroundStyle(Color.gray)
+                            .onLongPressGesture(minimumDuration: 0.5) {
+                                HapticManager.instance.notification(type: .success)
+                                isRecording = true
+                            }
+                            .padding(.trailing)
+                    } else {
+                        Image(systemName: "square.fill")
+                            .font(.title3)
+                            .foregroundStyle(Color.red)
+                            .onTapGesture {
+                                HapticManager.instance.impact(style: .light)
+                                isRecording = false
+                            }
+                            .padding(.trailing)
+                    }
+                }
             
             Button(action: {
-                if vm.getImagesCount() < 1 && vm.getVideosCount() < 1 {
+                if vm.getImagesCount() < 1 && vm.getVideosCount() < 1 && vm.getAudiosCount() < 1 {
                     Task {
                         await vm.sendMessage(chat: chat)
                         await MainActor.run{ vm.messageText = "" }
@@ -265,6 +302,9 @@ extension ChatRoomView {
             ForEach(vm.sendingVideos) { videoModel in
                 MessageTempView(mediaModel: videoModel, chat: chat)
             }
+            ForEach(vm.sendingAudios) { audioModel in
+                MessageTempView(mediaModel: audioModel, chat: chat)
+            }
         }
         .frame(maxWidth: .infinity)
     }
@@ -290,12 +330,16 @@ extension ChatRoomView {
                                     .frame(width: 120, height: 120)
                                     .clipShape(RoundedRectangle(cornerRadius: 15))
                                     .padding(10)
+                            case .audio(let audio):
+                                AudioPlayerView(audioURL: audio)
+                                    .frame(width: 300, height: 100)
+                                    .padding(.horizontal)
                             }
                         }
                     }
                 }
             } else {
-                Image(systemName: type == .image ? "photo" : "video.fill")
+                Image(systemName: type == .image ? "photo" : type == .video ? "video.fill" : "waveform")
                     .font(.title)
                     .foregroundStyle(Color.gray.opacity(0.7))
                     .fontWeight(.bold)
@@ -309,7 +353,7 @@ extension ChatRoomView {
             }
         }
         .overlay(alignment: .topTrailing, content: {
-            Text(type == .image ? vm.getImagesCount().description : vm.getVideosCount().description)
+            Text(type == .image ? vm.getImagesCount().description : type == .video ? vm.getVideosCount().description : vm.getAudiosCount().description)
                 .font(.headline)
                 .fontWeight(.semibold)
                 .foregroundStyle(Color.white)

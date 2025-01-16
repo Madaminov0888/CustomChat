@@ -22,6 +22,7 @@ struct MessageModel: Identifiable, Codable, Equatable {
     let dateSent: String
     let photoURL: String?
     let videoURL: String?
+    let audioURL: String?
     var isItSeen: Bool
     
     enum CodingKeys: String, CodingKey {
@@ -32,6 +33,7 @@ struct MessageModel: Identifiable, Codable, Equatable {
         case dateSent = "date_sent"
         case photoURL = "image_URL"
         case videoURL = "video_url"
+        case audioURL = "audio_url"
         case isItSeen = "is_it_seen"
     }
     
@@ -69,9 +71,11 @@ struct MessageMediaTempModel: Identifiable {
 enum MediaType {
     case image
     case video
+    case audio
 }
 
 enum MediaContent {
     case image(UIImage)
     case video(URL) // Video content will be represented by a URL (e.g., local file URL)
+    case audio(URL)
 }

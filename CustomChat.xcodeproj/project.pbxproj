@@ -16,8 +16,15 @@
 		D52CE00C2C1F38B2007DC5AC /* String+.swift in Sources */ = {isa = PBXBuildFile; fileRef = D52CE00B2C1F38B2007DC5AC /* String+.swift */; };
 		D542C5B52D3282CD0046CBA5 /* ProfileEditView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D542C5B42D3282CD0046CBA5 /* ProfileEditView.swift */; };
 		D542C5B72D32CBCA0046CBA5 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = D542C5B62D32CBCA0046CBA5 /* GoogleService-Info.plist */; };
+		D54AEE422D38F1B800951F79 /* WebRTC in Frameworks */ = {isa = PBXBuildFile; productRef = D54AEE412D38F1B800951F79 /* WebRTC */; };
+		D54AEE452D38F1FC00951F79 /* WebRTCManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = D54AEE442D38F1FC00951F79 /* WebRTCManager.swift */; };
+		D54AEE472D38F27A00951F79 /* CallView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D54AEE462D38F27A00951F79 /* CallView.swift */; };
+		D54AEE492D38F34C00951F79 /* WebsocketManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = D54AEE482D38F34C00951F79 /* WebsocketManager.swift */; };
 		D56D4B7D2BA1B41E007885E4 /* ChatsRowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D56D4B7C2BA1B41E007885E4 /* ChatsRowView.swift */; };
 		D56D4B7F2BA1D7A5007885E4 /* Preview+.swift in Sources */ = {isa = PBXBuildFile; fileRef = D56D4B7E2BA1D7A5007885E4 /* Preview+.swift */; };
+		D57BD76B2D37E2060079877A /* AudioPlayer.swift in Sources */ = {isa = PBXBuildFile; fileRef = D57BD76A2D37E2060079877A /* AudioPlayer.swift */; };
+		D57BD76D2D381B280079877A /* AudioRecorder.swift in Sources */ = {isa = PBXBuildFile; fileRef = D57BD76C2D381B280079877A /* AudioRecorder.swift */; };
+		D57BD76F2D3834770079877A /* HapticManagerClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = D57BD76E2D3834770079877A /* HapticManagerClass.swift */; };
 		D59A5FB12B9102A7009633BF /* FirebaseAnalytics in Frameworks */ = {isa = PBXBuildFile; productRef = D59A5FB02B9102A7009633BF /* FirebaseAnalytics */; };
 		D59A5FB32B9102A7009633BF /* FirebaseAnalyticsOnDeviceConversion in Frameworks */ = {isa = PBXBuildFile; productRef = D59A5FB22B9102A7009633BF /* FirebaseAnalyticsOnDeviceConversion */; };
 		D59A5FB52B9102A7009633BF /* FirebaseAnalyticsSwift in Frameworks */ = {isa = PBXBuildFile; productRef = D59A5FB42B9102A7009633BF /* FirebaseAnalyticsSwift */; };
@@ -74,8 +81,14 @@
 		D52CE00B2C1F38B2007DC5AC /* String+.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "String+.swift"; sourceTree = "<group>"; };
 		D542C5B42D3282CD0046CBA5 /* ProfileEditView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileEditView.swift; sourceTree = "<group>"; };
 		D542C5B62D32CBCA0046CBA5 /* GoogleService-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
+		D54AEE442D38F1FC00951F79 /* WebRTCManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebRTCManager.swift; sourceTree = "<group>"; };
+		D54AEE462D38F27A00951F79 /* CallView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CallView.swift; sourceTree = "<group>"; };
+		D54AEE482D38F34C00951F79 /* WebsocketManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebsocketManager.swift; sourceTree = "<group>"; };
 		D56D4B7C2BA1B41E007885E4 /* ChatsRowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatsRowView.swift; sourceTree = "<group>"; };
 		D56D4B7E2BA1D7A5007885E4 /* Preview+.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Preview+.swift"; sourceTree = "<group>"; };
+		D57BD76A2D37E2060079877A /* AudioPlayer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioPlayer.swift; sourceTree = "<group>"; };
+		D57BD76C2D381B280079877A /* AudioRecorder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioRecorder.swift; sourceTree = "<group>"; };
+		D57BD76E2D3834770079877A /* HapticManagerClass.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HapticManagerClass.swift; sourceTree = "<group>"; };
 		D59A5FE72B910346009633BF /* AuthView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthView.swift; sourceTree = "<group>"; };
 		D59A5FE92B910350009633BF /* AuthViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthViewModel.swift; sourceTree = "<group>"; };
 		D59A5FEC2B9103B9009633BF /* BackgroundView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackgroundView.swift; sourceTree = "<group>"; };
@@ -125,6 +138,7 @@
 				D59A5FFB2B9112C5009633BF /* GoogleSignIn in Frameworks */,
 				D59A5FB12B9102A7009633BF /* FirebaseAnalytics in Frameworks */,
 				D59A5FB32B9102A7009633BF /* FirebaseAnalyticsOnDeviceConversion in Frameworks */,
+				D54AEE422D38F1B800951F79 /* WebRTC in Frameworks */,
 				D59A5FBD2B9102A7009633BF /* FirebaseAuth in Frameworks */,
 				D59A5FE52B9102A8009633BF /* FirebaseStorageCombine-Community in Frameworks */,
 				D59A5FBF2B9102A7009633BF /* FirebaseAuthCombine-Community in Frameworks */,
@@ -135,6 +149,16 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		D54AEE432D38F1DB00951F79 /* PhoneCall */ = {
+			isa = PBXGroup;
+			children = (
+				D54AEE442D38F1FC00951F79 /* WebRTCManager.swift */,
+				D54AEE462D38F27A00951F79 /* CallView.swift */,
+				D54AEE482D38F34C00951F79 /* WebsocketManager.swift */,
+			);
+			path = PhoneCall;
+			sourceTree = "<group>";
+		};
 		D59A5FE62B910307009633BF /* AuthView */ = {
 			isa = PBXGroup;
 			children = (
@@ -154,6 +178,8 @@
 				D59A5FEE2B91060E009633BF /* TransparentBlurView.swift */,
 				D5CD7F6E2D2DBBC300530647 /* CustomTabBar.swift */,
 				D51402F22D2EA00F00E54CAE /* CustomImage.swift */,
+				D57BD76A2D37E2060079877A /* AudioPlayer.swift */,
+				D57BD76C2D381B280079877A /* AudioRecorder.swift */,
 			);
 			path = Components;
 			sourceTree = "<group>";
@@ -164,6 +190,7 @@
 				D52A0C1E2D2D2821006D67BD /* ImagePickerView.swift */,
 				D59A5FFE2B9112D5009633BF /* GoogleSignInHelper.swift */,
 				D59A5FF72B911289009633BF /* Utilities.swift */,
+				D57BD76E2D3834770079877A /* HapticManagerClass.swift */,
 			);
 			path = Utilities;
 			sourceTree = "<group>";
@@ -253,6 +280,7 @@
 				D59B2CBF2B92569D000280CD /* TabBarView.swift */,
 				D5CD7F702D2DBC3D00530647 /* Settings */,
 				D59B2CC12B9256A4000280CD /* ChatView */,
+				D54AEE432D38F1DB00951F79 /* PhoneCall */,
 				D59A5FE62B910307009633BF /* AuthView */,
 			);
 			path = Core;
@@ -319,6 +347,7 @@
 				D59A5FE42B9102A8009633BF /* FirebaseStorageCombine-Community */,
 				D59A5FFA2B9112C5009633BF /* GoogleSignIn */,
 				D59A5FFC2B9112C5009633BF /* GoogleSignInSwift */,
+				D54AEE412D38F1B800951F79 /* WebRTC */,
 			);
 			productName = CustomChat;
 			productReference = D5E5E0972B90989700815D39 /* CustomChat.app */;
@@ -351,6 +380,7 @@
 			packageReferences = (
 				D59A5FAF2B9102A7009633BF /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */,
 				D59A5FF92B9112C5009633BF /* XCRemoteSwiftPackageReference "GoogleSignIn-iOS" */,
+				D54AEE402D38F1B800951F79 /* XCRemoteSwiftPackageReference "WebRTC" */,
 			);
 			productRefGroup = D5E5E0982B90989700815D39 /* Products */;
 			projectDirPath = "";
@@ -379,6 +409,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				D54AEE472D38F27A00951F79 /* CallView.swift in Sources */,
 				D5BDAF282D2C319E00183A35 /* RegisterView.swift in Sources */,
 				D56D4B7F2BA1D7A5007885E4 /* Preview+.swift in Sources */,
 				D59A5FF12B91060E009633BF /* TransparentBlurModifier.swift in Sources */,
@@ -388,6 +419,7 @@
 				D5CD7F722D2DBC4B00530647 /* SettingsView.swift in Sources */,
 				D5E5E0B42B909A6400815D39 /* ChatModel.swift in Sources */,
 				D5AEC5012BA5F080008C514A /* Date+.swift in Sources */,
+				D57BD76D2D381B280079877A /* AudioRecorder.swift in Sources */,
 				D5E5E0B62B909EA000815D39 /* MessageModel.swift in Sources */,
 				D59A60012B9112E1009633BF /* AuthManager.swift in Sources */,
 				D59B2CCA2B925F02000280CD /* cornerRadius+.swift in Sources */,
@@ -397,6 +429,8 @@
 				D59A5FF82B911289009633BF /* Utilities.swift in Sources */,
 				D5E5E0AD2B90990A00815D39 /* NetworkManager.swift in Sources */,
 				D59A5FF02B91060E009633BF /* TransparentBlurView.swift in Sources */,
+				D54AEE492D38F34C00951F79 /* WebsocketManager.swift in Sources */,
+				D57BD76F2D3834770079877A /* HapticManagerClass.swift in Sources */,
 				D5AEC4FB2BA58A3F008C514A /* JSONDecoder+.swift in Sources */,
 				D52A0C1F2D2D2821006D67BD /* ImagePickerView.swift in Sources */,
 				D52A0C212D2D4D1C006D67BD /* StorageManager.swift in Sources */,
@@ -411,9 +445,11 @@
 				D525BF422BA2CBF80012FAF5 /* TextFieldModifier.swift in Sources */,
 				D5DAD6262D2F0DF70034EF99 /* MessageTempView.swift in Sources */,
 				D5AEC4FF2BA5EC53008C514A /* MessageRowView.swift in Sources */,
+				D54AEE452D38F1FC00951F79 /* WebRTCManager.swift in Sources */,
 				D5E5E0B22B90992700815D39 /* UserModel.swift in Sources */,
 				D5E5E09B2B90989700815D39 /* CustomChatApp.swift in Sources */,
 				D5F63C832BA301E100CFDBCB /* Binding+.swift in Sources */,
+				D57BD76B2D37E2060079877A /* AudioPlayer.swift in Sources */,
 				D51402EF2D2E970400E54CAE /* CacheManager.swift in Sources */,
 				D59B2CCC2B9260FD000280CD /* ChatManager.swift in Sources */,
 				D5F63C812BA2F4E700CFDBCB /* ChatRoomView.swift in Sources */,
@@ -559,6 +595,7 @@
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = CustomChat/Info.plist;
+				INFOPLIST_KEY_NSMicrophoneUsageDescription = "This app requires access to the microphone to record audio messages.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -589,6 +626,7 @@
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = CustomChat/Info.plist;
+				INFOPLIST_KEY_NSMicrophoneUsageDescription = "This app requires access to the microphone to record audio messages.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -631,6 +669,14 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
+		D54AEE402D38F1B800951F79 /* XCRemoteSwiftPackageReference "WebRTC" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/stasel/WebRTC.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 130.0.0;
+			};
+		};
 		D59A5FAF2B9102A7009633BF /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/firebase/firebase-ios-sdk";
@@ -650,6 +696,11 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
+		D54AEE412D38F1B800951F79 /* WebRTC */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = D54AEE402D38F1B800951F79 /* XCRemoteSwiftPackageReference "WebRTC" */;
+			productName = WebRTC;
+		};
 		D59A5FB02B9102A7009633BF /* FirebaseAnalytics */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = D59A5FAF2B9102A7009633BF /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;

@@ -67,6 +67,29 @@ final class StorageManager {
 
         // Get the download URL
         let downloadURL = try await reference.downloadURL()
+        return downloadURL
+    }
+    
+    
+    public func uploadMessageAudio(audioURL: URL, chatId: String, messageId: String, progress: @escaping (Progress?) -> Void) async throws -> URL {
+        // Reference to Firebase Storage location
+        let reference = chatsReference.child("\(chatId)/\(messageId).m4a")
+        let metadata = StorageMetadata()
+        metadata.contentType = "audio/m4a"
+
+        // Check if the video file exists at the given URL
+        guard FileManager.default.fileExists(atPath: audioURL.path) else {
+            throw StorageManagerError.couldntFindFile
+        }
+
+        // Read video file data
+        let audioData = try Data(contentsOf: audioURL)
+
+        // Upload the video data
+        let _ = try await reference.putDataAsync(audioData, metadata: metadata, onProgress: progress)
+
+        // Get the download URL
+        let downloadURL = try await reference.downloadURL()
         print("Video uploaded. Download URL: \(downloadURL)")
         return downloadURL
     }

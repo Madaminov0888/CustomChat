@@ -140,6 +140,7 @@ extension ChatView {
         HStack {
             ProfileImageView(otherUser: user)
                 .frame(width: 50, height: 50)
+                .clipShape(Circle())
             
             VStack(alignment: .leading) {
                 Text(user.name ?? "")
