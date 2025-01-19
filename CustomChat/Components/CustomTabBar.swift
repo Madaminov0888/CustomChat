@@ -68,7 +68,7 @@ struct CustomTabBar: View {
             .padding(.bottom, 20)
         })
         .padding(.bottom, 1)
-        .background(Color.white)
+        .background(Color.init(uiColor: .systemBackground))
     }
 }
 

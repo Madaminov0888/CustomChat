@@ -279,7 +279,7 @@ extension ChatRoomView {
             
         }
         .frame(maxWidth: .infinity)
-        .background(Color.white.cornerRadius(20, corners: [.bottomLeft, .bottomRight]))
+        .background(Color.init(uiColor: .systemBackground).cornerRadius(20, corners: [.bottomLeft, .bottomRight]))
     }
 }
 

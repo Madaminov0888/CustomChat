@@ -54,11 +54,13 @@ struct MessageRowView: View {
                 }
                 if let audioURL = message.audioURL, let url = URL(string: audioURL) {
                     VStack {
-                        AudioPlayerView(audioURL: url)
-                            .glassBlurView(currentUserID != message.sender.id ? Color.gray : Color.green)
+                        AudioPlayerView(audioURL: url, tintColor: message.sender.authId == currentUserID ? .white : .gray)
                             .frame(width: 300)
                             .scaledToFit()
                     }
+                    .frame(maxHeight: 50)
+                    .padding(.horizontal, 15)
+                    .padding(.top, 15)
                 }
 
                 if message.content.count > 0 {
@@ -83,7 +85,7 @@ struct MessageRowView: View {
                 .padding(.horizontal, 15)
                 .padding(.trailing, message.sender.authId == currentUserID ? 30 : 15)
             }
-            .background(message.sender.authId != currentUserID ? Color.white : Color.green)
+            .background(message.sender.authId != currentUserID ? Color.init(uiColor: .tertiarySystemBackground) : Color.green)
             .cornerRadius(20, corners: [.topLeft, .topRight, message.sender.authId != currentUserID ? .bottomRight : .bottomLeft])
             .foregroundStyle(message.sender.authId != currentUserID ? Color.black : Color.white)
             

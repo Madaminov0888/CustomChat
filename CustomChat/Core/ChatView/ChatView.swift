@@ -56,7 +56,7 @@ struct ChatView: View {
                     }
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
                 }
-                .background(Color.white)
+                .background(Color.init(uiColor: .systemBackground))
             }
             .navigationTitle("Chats")
             .navigationBarTitleDisplayMode(.automatic)
@@ -158,7 +158,6 @@ extension ChatView {
             }
             .padding(.horizontal, 10)
             .padding(.vertical, 5)
-            .background(Color.white.opacity(0.5))
             
             Spacer()
         }

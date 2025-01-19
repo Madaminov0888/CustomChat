@@ -51,6 +51,13 @@ struct ChatsRowView: View {
                                         .fontWeight(.semibold)
                                 }
                                 
+                                if let message = vm.getLastMessage(chat: chat), let _ = message.audioURL {
+                                    Image(systemName: "waveform.badge.microphone")
+                                        .font(.subheadline)
+                                        .foregroundStyle(Color.gray)
+                                        .fontWeight(.semibold)
+                                }
+                                
                                 Text(vm.getLastMessage(chat: chat)?.content ?? "")
                                     .font(.subheadline)
                                     .foregroundStyle(Color.gray)
